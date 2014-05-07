@@ -17,7 +17,7 @@ extern NSString * const KxMovieParameterMinBufferedDuration;    // Float
 extern NSString * const KxMovieParameterMaxBufferedDuration;    // Float
 extern NSString * const KxMovieParameterDisableDeinterlacing;   // BOOL
 
-@interface KxMovieViewController : UIViewController<UITableViewDataSource, UITableViewDelegate, UIDocumentInteractionControllerDelegate>
+@interface KxMovieViewController : UIViewController<UIDocumentInteractionControllerDelegate>
 {
     BOOL downloadable;
     NSString* documentPath;

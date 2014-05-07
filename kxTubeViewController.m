@@ -469,8 +469,7 @@ static NSMutableDictionary * gHistory;
     UIBarButtonItem* pla=[[UIBarButtonItem alloc] initWithCustomView:playButton];
     UIBarButtonItem* rew=[[UIBarButtonItem alloc] initWithCustomView:rewindButton];
     UIBarButtonItem* fas=[[UIBarButtonItem alloc] initWithCustomView:forwardButton];
-    UIBarButtonItem* vol=[[UIBarButtonItem alloc] initWithCustomView:volumeSlider];
-   
+    
     UIBarButtonItem *flexItem1 = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace  target:nil action:nil];
     UIBarButtonItem *rItem1 = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace  target:nil action:nil];
     rItem1.width=40.;
@@ -569,7 +568,6 @@ static NSMutableDictionary * gHistory;
 			if ([itag isEqualToString:@"37"] == NO)
                 if ([linkVideo isEqualToString:@""]){
                     linkVideo = link;
-                    lk=[resolutions valueForKey:itag];
                 }
 			//-------------------------------------------------------------------------------------------------------------------------------------
 			[links setObject:link forKey:[resolutions valueForKey:itag]];
@@ -904,7 +902,7 @@ static NSMutableDictionary * gHistory;
 	{
         NSString* i=[links valueForKey:buttonTitle];
         
-        Download* t=[[Download alloc] initWith:i withDelegate:[(UINavigationController_Rotation*)self.navigationController downloading] andDestination:[[[(UINavigationController_Rotation*)self.navigationController viewControllers] objectAtIndex:0] documentPath]];
+        Download* t=[[Download alloc] initWith:i withDelegate:[(UINavigationController_Rotation*)self.navigationController downloading] andDestination:[[[(UINavigationController_Rotation*)self.navigationController viewControllers] objectAtIndex:0] getDocumentPath]];
         if (item.title) {
             t.name=item.title;
         }
@@ -919,13 +917,7 @@ static NSMutableDictionary * gHistory;
         [_downloadButton setTitle:[NSString stringWithFormat:@"%d",[(UINavigationController_Rotation*)self.navigationController downloading].list.count] forState:UIControlStateHighlighted];
         _downloadButton.enabled=NO;
         
-        MainViewController* m=nil;
-        for (UIViewController* vc in self.navigationController.viewControllers) {
-            if ([vc isKindOfClass:[MainViewController class]]) {
-                m=(MainViewController*)vc;
-                break;
-            }
-        }
+        
         _downloadButton.enabled=NO;
        
         [self updateDownload:[NSString stringWithFormat:@"%d",[(UINavigationController_Rotation*)self.navigationController downloading].list.count]];
@@ -933,8 +925,10 @@ static NSMutableDictionary * gHistory;
 }
 
 -(void)updateDownload:(NSString*)titre{
+    _downloadButton.enabled=YES;
     [_downloadButton setTitle:titre forState:UIControlStateNormal];
     [_downloadButton setTitle:titre forState:UIControlStateHighlighted];
+    _downloadButton.enabled=NO;
 }
 - (void) doneDidTouch: (id) sender
 {
@@ -1699,10 +1693,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex {
         }
     }
     
-    if (_debugAudioStatus == 1) audioStatus = @"\n(audio outrun)";
-    else if (_debugAudioStatus == 2) audioStatus = @"\n(audio lags)";
-    else if (_debugAudioStatus == 3) audioStatus = @"\n(audio silence)";
-    else audioStatus = @"";
+   
     
     // _messageLabel.text = [NSString stringWithFormat:@"%d %d%@ %c - %@ %@ %@\n%@", _videoFrames.count, _audioFrames.count,  subinfo,  self.decoding ? 'D' : ' ', formatTimeInterval(timeSinceStart, NO),
     //timeSinceStart > _moviePosition + 0.5 ? @" (lags)" : @"", _decoder.isEOF ? @"- END" : @"", audioStatus,  _buffered ? [NSString stringWithFormat:@"buffering %.1f%%", _bufferedDuration / _minBufferedDuration * 100] : @""];

@@ -17,6 +17,7 @@
 #import "KxMovieGLView.h"
 #import <AVFoundation/AVFoundation.h>
 #import "Download.h"
+#import "MainViewController.h"
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "UINavigationController-Rotation.h"
 
@@ -322,8 +323,8 @@ static NSMutableDictionary * gHistory;
     _progressSlider.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     _progressSlider.continuous = NO;
     _progressSlider.value = 0;
-    [_progressSlider setThumbImage:[UIImage imageNamed:@"kxmovie.bundle/sliderthumb"]
-                          forState:UIControlStateNormal];
+    [_progressSlider setMinimumTrackTintColor:[UIColor redColor]];
+   // [_progressSlider setThumbImage:[UIImage imageNamed:@"kxmovie.bundle/sliderthumb"]  forState:UIControlStateNormal];
     
     _leftLabel = [[UILabel alloc] initWithFrame:CGRectMake(width-80,5,60,20)];
     _leftLabel.backgroundColor = [UIColor clearColor];
@@ -400,7 +401,7 @@ static NSMutableDictionary * gHistory;
     playButton.frame = CGRectMake(width * 0.5 - 20, 5, 33, 33);
     playButton.backgroundColor = [UIColor clearColor];
     playButton.showsTouchWhenHighlighted = YES;
-    [playButton setImage:[UIImage imageNamed:@"playback_pause"] forState:UIControlStateNormal];
+    [playButton setImage:[UIImage imageNamed:@"playback_play"] forState:UIControlStateNormal];
     [playButton addTarget:self action:@selector(playDidTouch:) forControlEvents:UIControlEventTouchUpInside];
     
    UIButton* forwardButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -420,10 +421,8 @@ static NSMutableDictionary * gHistory;
     UIBarButtonItem* pla=[[UIBarButtonItem alloc] initWithCustomView:playButton];
     UIBarButtonItem* rew=[[UIBarButtonItem alloc] initWithCustomView:rewindButton];
     UIBarButtonItem* fas=[[UIBarButtonItem alloc] initWithCustomView:forwardButton];
-    UIBarButtonItem* vol=[[UIBarButtonItem alloc] initWithCustomView:volumeSlider];
     infoButton.tintColor= [UIColor redColor];
     
-    UIBarButtonItem* inf=[[UIBarButtonItem alloc] initWithCustomView:infoButton];
     UIBarButtonItem *flexItem1 = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace  target:nil action:nil];
      UIBarButtonItem *rItem1 = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace  target:nil action:nil];
     rItem1.width=40.;
@@ -433,11 +432,11 @@ static NSMutableDictionary * gHistory;
         UIBarButtonItem* ex=[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveDidTouch:)];
         ex.tintColor=[UIColor redColor];
         rItem1.width=15.;
-        self.toolbarItems=[NSArray arrayWithObjects:ex,flexItem1,rew,rItem1,pla,rItem1,fas,flexItem1,inf, nil];
+        self.toolbarItems=[NSArray arrayWithObjects:ex,flexItem1,rew,rItem1,pla,rItem1,fas,flexItem1, nil];
         
     }
     else{
-       self.toolbarItems=[NSArray arrayWithObjects:flexItem1,rew,rItem1,pla,rItem1,fas,flexItem1,inf, nil];
+       self.toolbarItems=[NSArray arrayWithObjects:flexItem1,rew,rItem1,pla,rItem1,fas,flexItem1, nil];
     }
    
   
@@ -668,8 +667,8 @@ static NSMutableDictionary * gHistory;
         const CGFloat sc = fabsf(pt.x) * 0.33 * sp;
         if (sc > 10) {
             
-            const CGFloat ff = pt.x > 0 ? 1.0 : -1.0;            
-            [self setMoviePosition: _moviePosition + ff * MIN(sc, 600.0)];
+           // const CGFloat ff = pt.x > 0 ? 1.0 : -1.0;
+            //[self setMoviePosition: _moviePosition + ff * MIN(sc, 600.0)];
         }
         //NSLog(@"pan %.2f %.2f %.2f sec", pt.x, vt.x, sc);
     }
@@ -783,7 +782,7 @@ static NSMutableDictionary * gHistory;
 }
 - (void) downloadDidTouch: (UIButton*) sender
 {
-    Download* t=[[Download alloc] initWith:videoPath withDelegate:[(UINavigationController_Rotation*)self.navigationController downloading] andDestination:[[[(UINavigationController_Rotation*)self.navigationController viewControllers] objectAtIndex:0] documentPath]];
+    Download* t=[[Download alloc] initWith:videoPath withDelegate:[(UINavigationController_Rotation*)self.navigationController downloading] andDestination:[(MainViewController*)[[(UINavigationController_Rotation*)self.navigationController viewControllers] objectAtIndex:0] getDocumentPath]];
     if ([(UINavigationController_Rotation*)self.navigationController downloading].list==nil) {
         [(UINavigationController_Rotation*)self.navigationController downloading].list=[[NSMutableArray alloc] initWithCapacity:0];
     }
@@ -945,7 +944,7 @@ static NSMutableDictionary * gHistory;
         
     }
     else{
-       [self play];
+       //[self play];
     }
         //[self updatePosition:n.floatValue playMode:YES];
 //    else
@@ -1561,7 +1560,6 @@ clickedButtonAtIndex:(NSInteger)buttonIndex {
    // const NSTimeInterval timeSinceStart = [NSDate timeIntervalSinceReferenceDate] - _debugStartTime;
    // NSString *subinfo = _decoder.validSubtitles ? [NSString stringWithFormat: @" %d",_subtitles.count] : @"";
     
-    NSString *audioStatus;
     
     if (_debugAudioStatus) {
         
@@ -1570,11 +1568,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex {
         }
     }
     
-    if (_debugAudioStatus == 1) audioStatus = @"\n(audio outrun)";
-    else if (_debugAudioStatus == 2) audioStatus = @"\n(audio lags)";
-    else if (_debugAudioStatus == 3) audioStatus = @"\n(audio silence)";
-    else audioStatus = @"";
-    
+     
    // _messageLabel.text = [NSString stringWithFormat:@"%d %d%@ %c - %@ %@ %@\n%@", _videoFrames.count, _audioFrames.count,  subinfo,  self.decoding ? 'D' : ' ', formatTimeInterval(timeSinceStart, NO),
                           //timeSinceStart > _moviePosition + 0.5 ? @" (lags)" : @"", _decoder.isEOF ? @"- END" : @"", audioStatus,  _buffered ? [NSString stringWithFormat:@"buffering %.1f%%", _bufferedDuration / _minBufferedDuration * 100] : @""];
 #endif
